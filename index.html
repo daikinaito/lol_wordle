@@ -1,756 +1,799 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LOL ワードル</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d0f1c; /* Very dark blue/purple, representing the deep atmosphere of LOL */
-            color: #e0e0e0; /* Light text for contrast */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0d0f1c; /* Very dark blue/purple, representing the deep atmosphere of LOL */
+        color: #e0e0e0; /* Light text for contrast */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
 
+      .game-container {
+        background-color: #1a1f33; /* Slightly lighter dark blue for game elements */
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        border: 1px solid #4a688b; /* Muted blue border for a magical feel */
+      }
+
+      .title-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px; /* Space between title and button */
+        margin-bottom: 1rem;
+      }
+
+      .title {
+        color: #f7b538; /* Vibrant gold/orange, symbolizing power and epicness in LOL */
+        font-size: 2.5rem;
+        font-weight: bold;
+        text-align: center;
+        letter-spacing: 2px;
+        text-shadow: 0 0 10px rgba(247, 181, 56, 0.7); /* Matching glow for the title */
+      }
+
+      .board {
+        display: grid;
+        grid-template-rows: repeat(6, 1fr);
+        gap: 0.5rem;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.5rem;
+      }
+
+      .tile {
+        width: 100%;
+        padding-bottom: 100%; /* Makes tiles square based on width */
+        position: relative;
+        background-color: #2d3a52; /* Dark slate blue for default tiles */
+        border: 2px solid #4a688b; /* Matching game container border */
+        border-radius: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #e0e0e0;
+        transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.1s ease;
+        cursor: default;
+      }
+
+      .tile span {
+        position: absolute;
+      }
+
+      /* Tile colors - keeping standard Wordle logic but adjusting shades for cohesion */
+      .tile.correct {
+        background-color: #2b7a0b; /* Green for correct, slightly deeper */
+        border-color: #2b7a0b;
+      }
+
+      .tile.present {
+        background-color: #c9b458; /* Yellow for present, slightly muted gold */
+        border-color: #c9b458;
+      }
+
+      .tile.absent {
+        background-color: #4a4a4a; /* Grey for absent, dark and subtle */
+        border-color: #4a4a4a;
+      }
+
+      .action-button {
+        padding: 0.75rem 1.5rem;
+        background-color: #e65c00; /* Deep orange, like a powerful ability button */
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        white-space: nowrap; /* Prevent button text from wrapping */
+      }
+
+      .action-button:hover {
+        background-color: #cc4d00; /* Darker orange on hover */
+        transform: translateY(-2px);
+      }
+
+      .action-button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .message-box {
+        background-color: #1a1f33; /* Message box background matching game container */
+        padding: 1rem;
+        border-radius: 0.75rem;
+        text-align: center;
+        font-size: 1.1rem;
+        color: #ffe066; /* Light gold for messages, good visibility */
+        border: 1px solid #e65c00; /* Border matching button color */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      .message-box.hidden {
+        display: none;
+      }
+
+      .how-to-play-button-small {
+        background-color: #4a688b; /* A muted blue for instructions */
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.8rem; /* Smaller padding */
+        font-size: 0.9rem; /* Smaller font size */
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        white-space: nowrap;
+      }
+      .how-to-play-button-small:hover {
+        background-color: #3b577a;
+        transform: translateY(-1px);
+      }
+      .how-to-play-button-small:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .reset-button-container {
+        text-align: center;
+        margin-top: 1rem;
+      }
+
+      /* Modal specific styles */
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.7); /* Black w/ opacity */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .modal-content {
+        background-color: #1a1f33;
+        margin: auto;
+        padding: 25px;
+        border-radius: 1rem;
+        border: 1px solid #4a688b;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+        position: relative;
+        color: #e0e0e0;
+        font-size: 1rem;
+      }
+
+      .modal-content h2 {
+        color: #f7b538;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        text-align: center;
+        text-shadow: 0 0 5px rgba(247, 181, 56, 0.5);
+      }
+
+      .modal-content p {
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+      }
+
+      .modal-content strong {
+        color: #f7b538;
+      }
+
+      .modal-content ul {
+        list-style-type: disc;
+        margin-left: 20px;
+        margin-bottom: 1rem;
+      }
+
+      .modal-content li {
+        margin-bottom: 0.5rem;
+      }
+
+      .modal-close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .modal-close:hover,
+      .modal-close:focus {
+        color: #f7b538;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      /* Keyboard Styles */
+      .keyboard {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        width: 100%;
+        user-select: none; /* Prevent text selection on keyboard buttons */
+      }
+
+      .keyboard-row {
+        display: flex;
+        justify-content: center;
+        gap: 0.4rem;
+      }
+
+      .keyboard-button {
+        background-color: #2d3a52; /* Default keyboard button color */
+        color: #e0e0e0;
+        border: 1px solid #4a688b;
+        border-radius: 0.3rem;
+        padding: 0.8rem 0.5rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        flex-grow: 1;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.15s ease, transform 0.05s ease;
+        min-width: 30px; /* Ensure buttons have a minimum width */
+        line-height: 1; /* Adjust line height for better button text centering */
+      }
+
+      .keyboard-button.large {
+        flex-grow: 1.5; /* Make Enter/Del buttons wider */
+        font-size: 0.9rem;
+        padding: 0.8rem 0.8rem;
+      }
+
+      .keyboard-button:hover {
+        background-color: #3b4c6a;
+        transform: translateY(-1px);
+      }
+
+      .keyboard-button:active {
+        transform: translateY(0);
+      }
+
+      /* Keyboard button colors (matching tile colors) */
+      .keyboard-button.correct {
+        background-color: #2b7a0b; /* Green */
+        border-color: #2b7a0b;
+      }
+
+      .keyboard-button.present {
+        background-color: #c9b458; /* Yellow */
+        border-color: #c9b458;
+      }
+
+      .keyboard-button.absent {
+        background-color: #4a4a4a; /* Grey */
+        border-color: #4a4a4a;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 600px) {
         .game-container {
-            background-color: #1a1f33; /* Slightly lighter dark blue for game elements */
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            border: 1px solid #4a688b; /* Muted blue border for a magical feel */
+          padding: 1rem;
+          border-radius: 0.75rem;
+          gap: 1rem;
         }
 
         .title-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px; /* Space between title and button */
-            margin-bottom: 1rem;
+          flex-direction: column; /* Stack title and button on small screens */
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
         }
 
         .title {
-            color: #f7b538; /* Vibrant gold/orange, symbolizing power and epicness in LOL */
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-align: center;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(247, 181, 56, 0.7); /* Matching glow for the title */
-        }
-
-        .board {
-            display: grid;
-            grid-template-rows: repeat(6, 1fr);
-            gap: 0.5rem;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.5rem;
+          font-size: 2rem;
         }
 
         .tile {
-            width: 100%;
-            padding-bottom: 100%; /* Makes tiles square based on width */
-            position: relative;
-            background-color: #2d3a52; /* Dark slate blue for default tiles */
-            border: 2px solid #4a688b; /* Matching game container border */
-            border-radius: 0.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #e0e0e0;
-            transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.1s ease;
-            cursor: default;
-        }
-
-        .tile span {
-            position: absolute;
-        }
-
-        /* Tile colors - keeping standard Wordle logic but adjusting shades for cohesion */
-        .tile.correct {
-            background-color: #2b7a0b; /* Green for correct, slightly deeper */
-            border-color: #2b7a0b;
-        }
-
-        .tile.present {
-            background-color: #c9b458; /* Yellow for present, slightly muted gold */
-            border-color: #c9b458;
-        }
-
-        .tile.absent {
-            background-color: #4a4a4a; /* Grey for absent, dark and subtle */
-            border-color: #4a4a4a;
+          font-size: 1.5rem;
+          border-radius: 0.4rem;
         }
 
         .action-button {
-            padding: 0.75rem 1.5rem;
-            background-color: #e65c00; /* Deep orange, like a powerful ability button */
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1.25rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            white-space: nowrap; /* Prevent button text from wrapping */
-        }
-
-        .action-button:hover {
-            background-color: #cc4d00; /* Darker orange on hover */
-            transform: translateY(-2px);
-        }
-
-        .action-button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .message-box {
-            background-color: #1a1f33; /* Message box background matching game container */
-            padding: 1rem;
-            border-radius: 0.75rem;
-            text-align: center;
-            font-size: 1.1rem;
-            color: #ffe066; /* Light gold for messages, good visibility */
-            border: 1px solid #e65c00; /* Border matching button color */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-        }
-
-        .message-box.hidden {
-            display: none;
+          width: auto; /* Allow button to size itself */
+          font-size: 1rem;
+          padding: 0.6rem 1rem;
         }
 
         .how-to-play-button-small {
-            background-color: #4a688b; /* A muted blue for instructions */
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.5rem 0.8rem; /* Smaller padding */
-            font-size: 0.9rem; /* Smaller font size */
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.1s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            white-space: nowrap;
-        }
-        .how-to-play-button-small:hover {
-            background-color: #3b577a;
-            transform: translateY(-1px);
-        }
-        .how-to-play-button-small:active {
-            transform: translateY(0);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+          font-size: 0.8rem;
+          padding: 0.4rem 0.6rem;
         }
 
-        .reset-button-container {
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        /* Modal specific styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background-color: #1a1f33;
-            margin: auto;
-            padding: 25px;
-            border-radius: 1rem;
-            border: 1px solid #4a688b;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
-            position: relative;
-            color: #e0e0e0;
-            font-size: 1rem;
-        }
-
-        .modal-content h2 {
-            color: #f7b538;
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            text-align: center;
-            text-shadow: 0 0 5px rgba(247, 181, 56, 0.5);
-        }
-
-        .modal-content p {
-            margin-bottom: 0.75rem;
-            line-height: 1.5;
-        }
-
-        .modal-content strong {
-            color: #f7b538;
-        }
-
-        .modal-content ul {
-            list-style-type: disc;
-            margin-left: 20px;
-            margin-bottom: 1rem;
-        }
-
-        .modal-content li {
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-close {
-            color: #aaa;
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .modal-close:hover,
-        .modal-close:focus {
-            color: #f7b538;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        /* Keyboard Styles */
-        .keyboard {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-            width: 100%;
-            user-select: none; /* Prevent text selection on keyboard buttons */
-        }
-
-        .keyboard-row {
-            display: flex;
-            justify-content: center;
-            gap: 0.4rem;
+        .message-box {
+          font-size: 0.95rem;
+          padding: 0.75rem;
         }
 
         .keyboard-button {
-            background-color: #2d3a52; /* Default keyboard button color */
-            color: #e0e0e0;
-            border: 1px solid #4a688b;
-            border-radius: 0.3rem;
-            padding: 0.8rem 0.5rem;
-            font-size: 1.1rem;
-            font-weight: bold;
-            flex-grow: 1;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.15s ease, transform 0.05s ease;
-            min-width: 30px; /* Ensure buttons have a minimum width */
-            line-height: 1; /* Adjust line height for better button text centering */
+          font-size: 0.9rem;
+          padding: 0.6rem 0.3rem;
+          min-width: unset; /* Allow flexible width */
         }
 
         .keyboard-button.large {
-            flex-grow: 1.5; /* Make Enter/Del buttons wider */
-            font-size: 0.9rem;
-            padding: 0.8rem 0.8rem;
+          font-size: 0.8rem;
+          padding: 0.6rem 0.5rem;
         }
-
-        .keyboard-button:hover {
-            background-color: #3b4c6a;
-            transform: translateY(-1px);
+        .keyboard-row {
+          gap: 0.3rem;
         }
-
-        .keyboard-button:active {
-            transform: translateY(0);
-        }
-
-        /* Keyboard button colors (matching tile colors) */
-        .keyboard-button.correct {
-            background-color: #2b7a0b; /* Green */
-            border-color: #2b7a0b;
-        }
-
-        .keyboard-button.present {
-            background-color: #c9b458; /* Yellow */
-            border-color: #c9b458;
-        }
-
-        .keyboard-button.absent {
-            background-color: #4a4a4a; /* Grey */
-            border-color: #4a4a4a;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .game-container {
-                padding: 1rem;
-                border-radius: 0.75rem;
-                gap: 1rem;
-            }
-
-            .title-container {
-                flex-direction: column; /* Stack title and button on small screens */
-                gap: 0.5rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .title {
-                font-size: 2rem;
-            }
-
-            .tile {
-                font-size: 1.5rem;
-                border-radius: 0.4rem;
-            }
-
-            .action-button {
-                width: auto; /* Allow button to size itself */
-                font-size: 1rem;
-                padding: 0.6rem 1rem;
-            }
-
-            .how-to-play-button-small {
-                font-size: 0.8rem;
-                padding: 0.4rem 0.6rem;
-            }
-
-            .message-box {
-                font-size: 0.95rem;
-                padding: 0.75rem;
-            }
-
-            .keyboard-button {
-                font-size: 0.9rem;
-                padding: 0.6rem 0.3rem;
-                min-width: unset; /* Allow flexible width */
-            }
-
-            .keyboard-button.large {
-                font-size: 0.8rem;
-                padding: 0.6rem 0.5rem;
-            }
-            .keyboard-row {
-                gap: 0.3rem;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="game-container">
-        <div class="title-container">
-            <h1 class="title">LOL ワードル</h1>
-            <button id="howToPlayButton" class="how-to-play-button-small">遊び方</button>
-        </div>
-        <div id="gameBoard" class="board">
-            <!-- Game rows will be generated here by JavaScript -->
-        </div>
-        <div id="messageBox" class="message-box hidden"></div>
+      <div class="title-container">
+        <h1 class="title">LOL ワードル</h1>
+        <button id="howToPlayButton" class="how-to-play-button-small">遊び方</button>
+      </div>
+      <div id="gameBoard" class="board">
+        <!-- Game rows will be generated here by JavaScript -->
+      </div>
+      <div id="messageBox" class="message-box hidden"></div>
 
-        <!-- On-screen Keyboard -->
-        <div id="keyboard" class="keyboard">
-            <div class="keyboard-row">
-                <button class="keyboard-button" data-key="Q">Q</button>
-                <button class="keyboard-button" data-key="W">W</button>
-                <button class="keyboard-button" data-key="E">E</button>
-                <button class="keyboard-button" data-key="R">R</button>
-                <button class="keyboard-button" data-key="T">T</button>
-                <button class="keyboard-button" data-key="Y">Y</button>
-                <button class="keyboard-button" data-key="U">U</button>
-                <button class="keyboard-button" data-key="I">I</button>
-                <button class="keyboard-button" data-key="O">O</button>
-                <button class="keyboard-button" data-key="P">P</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="keyboard-button" data-key="A">A</button>
-                <button class="keyboard-button" data-key="S">S</button>
-                <button class="keyboard-button" data-key="D">D</button>
-                <button class="keyboard-button" data-key="F">F</button>
-                <button class="keyboard-button" data-key="G">G</button>
-                <button class="keyboard-button" data-key="H">H</button>
-                <button class="keyboard-button" data-key="J">J</button>
-                <button class="keyboard-button" data-key="K">K</button>
-                <button class="keyboard-button" data-key="L">L</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="keyboard-button large" data-key="Enter">Enter</button>
-                <button class="keyboard-button" data-key="Z">Z</button>
-                <button class="keyboard-button" data-key="X">X</button>
-                <button class="keyboard-button" data-key="C">C</button>
-                <button class="keyboard-button" data-key="V">V</button>
-                <button class="keyboard-button" data-key="B">B</button>
-                <button class="keyboard-button" data-key="N">N</button>
-                <button class="keyboard-button" data-key="M">M</button>
-                <button class="keyboard-button large" data-key="Backspace">Del</button>
-            </div>
+      <!-- On-screen Keyboard -->
+      <div id="keyboard" class="keyboard">
+        <div class="keyboard-row">
+          <button class="keyboard-button" data-key="Q">Q</button>
+          <button class="keyboard-button" data-key="W">W</button>
+          <button class="keyboard-button" data-key="E">E</button>
+          <button class="keyboard-button" data-key="R">R</button>
+          <button class="keyboard-button" data-key="T">T</button>
+          <button class="keyboard-button" data-key="Y">Y</button>
+          <button class="keyboard-button" data-key="U">U</button>
+          <button class="keyboard-button" data-key="I">I</button>
+          <button class="keyboard-button" data-key="O">O</button>
+          <button class="keyboard-button" data-key="P">P</button>
         </div>
+        <div class="keyboard-row">
+          <button class="keyboard-button" data-key="A">A</button>
+          <button class="keyboard-button" data-key="S">S</button>
+          <button class="keyboard-button" data-key="D">D</button>
+          <button class="keyboard-button" data-key="F">F</button>
+          <button class="keyboard-button" data-key="G">G</button>
+          <button class="keyboard-button" data-key="H">H</button>
+          <button class="keyboard-button" data-key="J">J</button>
+          <button class="keyboard-button" data-key="K">K</button>
+          <button class="keyboard-button" data-key="L">L</button>
+        </div>
+        <div class="keyboard-row">
+          <button class="keyboard-button large" data-key="Enter">Enter</button>
+          <button class="keyboard-button" data-key="Z">Z</button>
+          <button class="keyboard-button" data-key="X">X</button>
+          <button class="keyboard-button" data-key="C">C</button>
+          <button class="keyboard-button" data-key="V">V</button>
+          <button class="keyboard-button" data-key="B">B</button>
+          <button class="keyboard-button" data-key="N">N</button>
+          <button class="keyboard-button" data-key="M">M</button>
+          <button class="keyboard-button large" data-key="Backspace">Del</button>
+        </div>
+      </div>
 
-        <!-- Reset Button -->
-        <div class="reset-button-container">
-            <button id="resetButton" class="action-button hidden">リセット</button>
-        </div>
+      <!-- Reset Button -->
+      <div class="reset-button-container">
+        <button id="resetButton" class="action-button hidden">リセット</button>
+      </div>
     </div>
 
     <!-- How to Play Modal -->
     <div id="howToPlayModal" class="modal hidden">
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <h2>遊び方</h2>
-            <p><strong>LOL ワードル</strong> へようこそ！隠された5文字のLOLチャンピオン名を当てましょう。</p>
-            <ul>
-                <li>推測は6回までです。</li>
-                <li>オンスクリーンキーボードまたは物理キーボードを使って、5文字のLOLチャンピオン名（英字）を入力し、「Enter」キーを押してください。</li>
-                <li>推測後、各文字の背景色とキーボード上の文字の色が変わります。</li>
-            </ul>
-            <p><strong>タイルの色について:</strong></p>
-            <ul>
-                <li><span style="background-color: #2b7a0b; padding: 2px 8px; border-radius: 4px; color: white;">緑</span>: その文字は隠された単語に含まれ、<strong>正しい位置</strong>にあります。</li>
-                <li><span style="background-color: #c9b458; padding: 2px 8px; border-radius: 4px; color: white;">黄</span>: その文字は隠された単語に含まれますが、<strong>位置が異なります</strong>。</li>
-                <li><span style="background-color: #4a4a4a; padding: 2px 8px; border-radius: 4px; color: white;">灰</span>: その文字は隠された単語に<strong>全く含まれません</strong>。</li>
-            </ul>
-            <p>さあ、挑戦してチャンピオンマスターを目指しましょう！</p>
-        </div>
+      <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>遊び方</h2>
+        <p><strong>LOL ワードル</strong> へようこそ！隠された5文字のLOLチャンピオン名を当てましょう。</p>
+        <ul>
+          <li>推測は6回までです。</li>
+          <li>
+            オンスクリーンキーボードまたは物理キーボードを使って、5文字のLOLチャンピオン名（英字）を入力し、「Enter」キーを押してください。
+          </li>
+          <li>推測後、各文字の背景色とキーボード上の文字の色が変わります。</li>
+        </ul>
+        <p><strong>タイルの色について:</strong></p>
+        <ul>
+          <li>
+            <span style="background-color: #2b7a0b; padding: 2px 8px; border-radius: 4px; color: white">緑</span>:
+            その文字は隠された単語に含まれ、<strong>正しい位置</strong>にあります。
+          </li>
+          <li>
+            <span style="background-color: #c9b458; padding: 2px 8px; border-radius: 4px; color: white">黄</span>:
+            その文字は隠された単語に含まれますが、<strong>位置が異なります</strong>。
+          </li>
+          <li>
+            <span style="background-color: #4a4a4a; padding: 2px 8px; border-radius: 4px; color: white">灰</span>:
+            その文字は隠された単語に<strong>全く含まれません</strong>。
+          </li>
+        </ul>
+        <p>さあ、挑戦してチャンピオンマスターを目指しましょう！</p>
+      </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Curated list of 5-letter League of Legends champion names
-            const lolCharacterNames = [
-                "AKALI", "BLITZ", "GAREN", "JANNA", "KAYLE", "LEONA",
-                "MUNDO", "NEEKO", "RIVEN", "SWAIN", "TALON", "TARIC",
-                "TEEMO", "URGOT", "VARUS", "YASUO", "ZYRA"
-            ];
-            const WORD_LENGTH = 5;
-            const MAX_ATTEMPTS = 6;
+      document.addEventListener("DOMContentLoaded", () => {
+        // Complete list of 5-letter League of Legends champion names
+        const lolCharacterNames = [
+          "AKALI",
+          "ANNIE",
+          "BRAND",
+          "BRAUM",
+          "DIANA",
+          "FIORA",
+          "GAREN",
+          "JANNA",
+          "JAYCE",
+          "KARMA",
+          "KAYLE",
+          "LEONA",
+          "NASUS",
+          "NEEKO",
+          "NILAH",
+          "POPPY",
+          "QUINN",
+          "RAKAN",
+          "RIVEN",
+          "SENNA",
+          "SHACO",
+          "SIVIR",
+          "SWAIN",
+          "SYLAS",
+          "TALON",
+          "TARIC",
+          "TEEMO",
+          "URGOT",
+          "VARUS",
+          "VAYNE",
+          "VIEGO",
+          "XAYAH",
+          "YASUO",
+          "YUUMI",
+          "ZIGGS",
+        ];
+        const WORD_LENGTH = 5;
+        const MAX_ATTEMPTS = 6;
 
-            let secretWord = '';
-            let currentAttempt = 0;
-            let gameEnded = false;
-            // Array to store letters currently being input by the user for the current row
-            let currentInputLetters = [];
-            // Store the state of keyboard letters (e.g., {'A': 'absent', 'B': 'present'})
-            let keyboardLetterStates = {};
+        let secretWord = "";
+        let currentAttempt = 0;
+        let gameEnded = false;
+        // Array to store letters currently being input by the user for the current row
+        let currentInputLetters = [];
+        // Store the state of keyboard letters (e.g., {'A': 'absent', 'B': 'present'})
+        let keyboardLetterStates = {};
 
-            const gameBoard = document.getElementById('gameBoard');
-            const messageBox = document.getElementById('messageBox');
-            const resetButton = document.getElementById('resetButton');
-            const howToPlayButton = document.getElementById('howToPlayButton');
-            const howToPlayModal = document.getElementById('howToPlayModal'); // Get the modal element
-            const modalCloseButton = howToPlayModal.querySelector('.modal-close'); // Get the close button within the modal
-            const keyboardElement = document.getElementById('keyboard'); // Reference to the keyboard
+        const gameBoard = document.getElementById("gameBoard");
+        const messageBox = document.getElementById("messageBox");
+        const resetButton = document.getElementById("resetButton");
+        const howToPlayButton = document.getElementById("howToPlayButton");
+        const howToPlayModal = document.getElementById("howToPlayModal"); // Get the modal element
+        const modalCloseButton = howToPlayModal.querySelector(".modal-close"); // Get the close button within the modal
+        const keyboardElement = document.getElementById("keyboard"); // Reference to the keyboard
 
-            /**
-             * Initializes the game by selecting a new secret word,
-             * resetting game state, and updating the UI.
-             */
-            function initializeGame() {
-                secretWord = lolCharacterNames[Math.floor(Math.random() * lolCharacterNames.length)];
-                currentAttempt = 0;
-                gameEnded = false;
-                messageBox.classList.add('hidden');
-                resetButton.classList.add('hidden');
-                currentInputLetters = []; // Reset current input letters
+        /**
+         * Initializes the game by selecting a new secret word,
+         * resetting game state, and updating the UI.
+         */
+        function initializeGame() {
+          secretWord = lolCharacterNames[Math.floor(Math.random() * lolCharacterNames.length)];
+          currentAttempt = 0;
+          gameEnded = false;
+          messageBox.classList.add("hidden");
+          resetButton.classList.add("hidden");
+          currentInputLetters = []; // Reset current input letters
 
-                // Reset keyboard letter states and colors
-                keyboardLetterStates = {};
-                resetKeyboardColors();
+          // Reset keyboard letter states and colors
+          keyboardLetterStates = {};
+          resetKeyboardColors();
 
-                renderBoard(); // Render a fresh board
+          renderBoard(); // Render a fresh board
+        }
+
+        /**
+         * Renders the game board dynamically.
+         * Creates rows and tiles based on MAX_ATTEMPTS and WORD_LENGTH.
+         */
+        function renderBoard() {
+          gameBoard.innerHTML = ""; // Clear existing board
+          for (let i = 0; i < MAX_ATTEMPTS; i++) {
+            const row = document.createElement("div");
+            row.classList.add("row");
+            for (let j = 0; j < WORD_LENGTH; j++) {
+              const tile = document.createElement("div");
+              tile.classList.add("tile");
+              tile.setAttribute("data-row", i);
+              tile.setAttribute("data-col", j);
+              const span = document.createElement("span");
+              span.textContent = ""; // Initial empty content
+              tile.appendChild(span);
+              row.appendChild(tile);
+            }
+            gameBoard.appendChild(row);
+          }
+        }
+
+        /**
+         * Updates a specific tile on the board with a letter.
+         * @param {number} row - The row index.
+         * @param {number} col - The column index.
+         * @param {string} letter - The letter to display.
+         */
+        function updateTile(row, col, letter) {
+          // Ensure the column index is within bounds before attempting to update
+          if (col < 0 || col >= WORD_LENGTH) return;
+          const tile = gameBoard.querySelector(`.tile[data-row="${row}"][data-col="${col}"] span`);
+          if (tile) {
+            tile.textContent = letter.toUpperCase();
+          }
+        }
+
+        /**
+         * Displays a message to the user in the message box.
+         * @param {string} message - The message to display.
+         */
+        function displayMessage(message) {
+          messageBox.innerHTML = message;
+          messageBox.classList.remove("hidden");
+        }
+
+        /**
+         * Handles the user's guess submission.
+         * Validates input and processes the guess.
+         */
+        function handleGuess() {
+          if (gameEnded) return;
+
+          const guess = currentInputLetters.join("").toUpperCase(); // Get guess from currentInputLetters
+
+          if (guess.length !== WORD_LENGTH) {
+            displayMessage(`${WORD_LENGTH}文字のLOLチャンピオン名（英字）を入力してください。`);
+            return;
+          }
+
+          if (!lolCharacterNames.includes(guess)) {
+            displayMessage("有効なLOLチャンピオン名ではありません。");
+            return;
+          }
+
+          messageBox.classList.add("hidden"); // Clear previous messages
+
+          processGuess(guess);
+        }
+
+        /**
+         * Processes the guessed word, updates tile colors and keyboard colors,
+         * and checks game end conditions.
+         * @param {string} guess - The user's guessed word.
+         */
+        function processGuess(guess) {
+          const secretWordCopy = secretWord.split(""); // Use a copy to manage letter counts
+          const currentRowTiles = gameBoard.querySelectorAll(`.tile[data-row="${currentAttempt}"]`);
+          const guessLetters = guess.split("");
+
+          // Array to store the result for each letter in the current guess
+          // 0: absent, 1: present, 2: correct
+          const letterResults = new Array(WORD_LENGTH).fill(0);
+
+          // First pass: Mark correct (green) letters and consume them from secretWordCopy
+          for (let i = 0; i < WORD_LENGTH; i++) {
+            const tile = currentRowTiles[i];
+            // Update tile content, though it should already be set by input handling
+            updateTile(currentAttempt, i, guessLetters[i]);
+
+            if (guessLetters[i] === secretWordCopy[i]) {
+              letterResults[i] = 2; // Correct
+              secretWordCopy[i] = null; // Mark as consumed
+            }
+          }
+
+          // Second pass: Mark present (yellow) and absent (grey) letters
+          for (let i = 0; i < WORD_LENGTH; i++) {
+            const tile = currentRowTiles[i];
+            if (letterResults[i] === 2) {
+              // Already marked as correct
+              tile.classList.add("correct");
+              updateKeyboardColor(guessLetters[i], "correct");
+              continue;
             }
 
-            /**
-             * Renders the game board dynamically.
-             * Creates rows and tiles based on MAX_ATTEMPTS and WORD_LENGTH.
-             */
-            function renderBoard() {
-                gameBoard.innerHTML = ''; // Clear existing board
-                for (let i = 0; i < MAX_ATTEMPTS; i++) {
-                    const row = document.createElement('div');
-                    row.classList.add('row');
-                    for (let j = 0; j < WORD_LENGTH; j++) {
-                        const tile = document.createElement('div');
-                        tile.classList.add('tile');
-                        tile.setAttribute('data-row', i);
-                        tile.setAttribute('data-col', j);
-                        const span = document.createElement('span');
-                        span.textContent = ''; // Initial empty content
-                        tile.appendChild(span);
-                        row.appendChild(tile);
-                    }
-                    gameBoard.appendChild(row);
-                }
+            const indexOfLetterInSecret = secretWordCopy.indexOf(guessLetters[i]);
+            if (indexOfLetterInSecret !== -1) {
+              letterResults[i] = 1; // Present
+              secretWordCopy[indexOfLetterInSecret] = null; // Mark as consumed
+              tile.classList.add("present");
+              updateKeyboardColor(guessLetters[i], "present");
+            } else {
+              letterResults[i] = 0; // Absent
+              tile.classList.add("absent");
+              updateKeyboardColor(guessLetters[i], "absent");
             }
+          }
 
-            /**
-             * Updates a specific tile on the board with a letter.
-             * @param {number} row - The row index.
-             * @param {number} col - The column index.
-             * @param {string} letter - The letter to display.
-             */
-            function updateTile(row, col, letter) {
-                // Ensure the column index is within bounds before attempting to update
-                if (col < 0 || col >= WORD_LENGTH) return;
-                const tile = gameBoard.querySelector(`.tile[data-row="${row}"][data-col="${col}"] span`);
-                if (tile) {
-                    tile.textContent = letter.toUpperCase();
-                }
+          // Check win/loss conditions
+          if (guess === secretWord) {
+            displayMessage(`おめでとうございます！ '${secretWord}' を当てました！`);
+            endGame(true);
+          } else if (currentAttempt >= MAX_ATTEMPTS - 1) {
+            displayMessage(`残念！正解は '${secretWord}' でした。`);
+            endGame(false);
+          } else {
+            currentAttempt++;
+            currentInputLetters = []; // Clear input letters for the next attempt
+          }
+        }
+
+        /**
+         * Updates the color of a keyboard button based on its state.
+         * Prioritizes correct > present > absent.
+         * @param {string} letter - The letter of the keyboard button.
+         * @param {string} newState - The new state ('correct', 'present', 'absent').
+         */
+        function updateKeyboardColor(letter, newState) {
+          const button = keyboardElement.querySelector(`[data-key="${letter}"]`);
+          if (!button) return;
+
+          const currentState = keyboardLetterStates[letter];
+
+          // If current state is 'correct', do not downgrade
+          if (currentState === "correct") {
+            return;
+          }
+          // If current state is 'present' and new state is 'correct', upgrade
+          if (currentState === "present" && newState === "correct") {
+            button.classList.remove("present", "absent");
+            button.classList.add("correct");
+            keyboardLetterStates[letter] = "correct";
+            return;
+          }
+          // If current state is 'absent' and new state is 'present' or 'correct', upgrade
+          if (currentState === "absent" && (newState === "present" || newState === "correct")) {
+            button.classList.remove("absent");
+            button.classList.add(newState);
+            keyboardLetterStates[letter] = newState;
+            return;
+          }
+          // If no state yet, or current state is worse than new state (e.g., no state -> absent)
+          if (!currentState) {
+            button.classList.add(newState);
+            keyboardLetterStates[letter] = newState;
+            return;
+          }
+        }
+
+        /**
+         * Resets all keyboard button colors to their default state.
+         */
+        function resetKeyboardColors() {
+          const buttons = keyboardElement.querySelectorAll(".keyboard-button");
+          buttons.forEach((button) => {
+            button.classList.remove("correct", "present", "absent");
+          });
+        }
+
+        /**
+         * Ends the game, disabling input and showing the reset button.
+         * @param {boolean} won - True if the player won, false otherwise.
+         */
+        function endGame(won) {
+          gameEnded = true;
+          resetButton.classList.remove("hidden");
+        }
+
+        /**
+         * Shows the "How to Play" modal.
+         */
+        function showHowToPlayModal() {
+          howToPlayModal.classList.remove("hidden");
+          howToPlayModal.style.display = "flex"; // Ensure it uses flex for centering
+        }
+
+        /**
+         * Hides the "How to Play" modal.
+         */
+        function hideHowToPlayModal() {
+          howToPlayModal.classList.add("hidden");
+          howToPlayModal.style.display = "none"; // Revert to none for complete hiding
+        }
+
+        // --- Event Listeners ---
+
+        // Physical keyboard input
+        document.addEventListener("keydown", (event) => {
+          if (gameEnded) return;
+
+          const key = event.key.toUpperCase();
+
+          if (key.length === 1 && key >= "A" && key <= "Z" && currentInputLetters.length < WORD_LENGTH) {
+            currentInputLetters.push(key);
+            updateTile(currentAttempt, currentInputLetters.length - 1, key);
+          } else if (key === "BACKSPACE") {
+            if (currentInputLetters.length > 0) {
+              const lastIndex = currentInputLetters.length - 1; // Get the index of the character to clear
+              currentInputLetters.pop();
+              updateTile(currentAttempt, lastIndex, ""); // Clear the tile at that index
             }
-
-            /**
-             * Displays a message to the user in the message box.
-             * @param {string} message - The message to display.
-             */
-            function displayMessage(message) {
-                messageBox.innerHTML = message;
-                messageBox.classList.remove('hidden');
-            }
-
-            /**
-             * Handles the user's guess submission.
-             * Validates input and processes the guess.
-             */
-            function handleGuess() {
-                if (gameEnded) return;
-
-                const guess = currentInputLetters.join('').toUpperCase(); // Get guess from currentInputLetters
-
-                if (guess.length !== WORD_LENGTH) {
-                    displayMessage(`${WORD_LENGTH}文字のLOLチャンピオン名（英字）を入力してください。`);
-                    return;
-                }
-
-                if (!lolCharacterNames.includes(guess)) {
-                    displayMessage('有効なLOLチャンピオン名ではありません。');
-                    return;
-                }
-
-                messageBox.classList.add('hidden'); // Clear previous messages
-
-                processGuess(guess);
-            }
-
-            /**
-             * Processes the guessed word, updates tile colors and keyboard colors,
-             * and checks game end conditions.
-             * @param {string} guess - The user's guessed word.
-             */
-            function processGuess(guess) {
-                const secretWordCopy = secretWord.split(''); // Use a copy to manage letter counts
-                const currentRowTiles = gameBoard.querySelectorAll(`.tile[data-row="${currentAttempt}"]`);
-                const guessLetters = guess.split('');
-
-                // Array to store the result for each letter in the current guess
-                // 0: absent, 1: present, 2: correct
-                const letterResults = new Array(WORD_LENGTH).fill(0);
-
-                // First pass: Mark correct (green) letters and consume them from secretWordCopy
-                for (let i = 0; i < WORD_LENGTH; i++) {
-                    const tile = currentRowTiles[i];
-                    // Update tile content, though it should already be set by input handling
-                    updateTile(currentAttempt, i, guessLetters[i]);
-
-                    if (guessLetters[i] === secretWordCopy[i]) {
-                        letterResults[i] = 2; // Correct
-                        secretWordCopy[i] = null; // Mark as consumed
-                    }
-                }
-
-                // Second pass: Mark present (yellow) and absent (grey) letters
-                for (let i = 0; i < WORD_LENGTH; i++) {
-                    const tile = currentRowTiles[i];
-                    if (letterResults[i] === 2) { // Already marked as correct
-                        tile.classList.add('correct');
-                        updateKeyboardColor(guessLetters[i], 'correct');
-                        continue;
-                    }
-
-                    const indexOfLetterInSecret = secretWordCopy.indexOf(guessLetters[i]);
-                    if (indexOfLetterInSecret !== -1) {
-                        letterResults[i] = 1; // Present
-                        secretWordCopy[indexOfLetterInSecret] = null; // Mark as consumed
-                        tile.classList.add('present');
-                        updateKeyboardColor(guessLetters[i], 'present');
-                    } else {
-                        letterResults[i] = 0; // Absent
-                        tile.classList.add('absent');
-                        updateKeyboardColor(guessLetters[i], 'absent');
-                    }
-                }
-
-                // Check win/loss conditions
-                if (guess === secretWord) {
-                    displayMessage(`おめでとうございます！ '${secretWord}' を当てました！`);
-                    endGame(true);
-                } else if (currentAttempt >= MAX_ATTEMPTS - 1) {
-                    displayMessage(`残念！正解は '${secretWord}' でした。`);
-                    endGame(false);
-                } else {
-                    currentAttempt++;
-                    currentInputLetters = []; // Clear input letters for the next attempt
-                }
-            }
-
-            /**
-             * Updates the color of a keyboard button based on its state.
-             * Prioritizes correct > present > absent.
-             * @param {string} letter - The letter of the keyboard button.
-             * @param {string} newState - The new state ('correct', 'present', 'absent').
-             */
-            function updateKeyboardColor(letter, newState) {
-                const button = keyboardElement.querySelector(`[data-key="${letter}"]`);
-                if (!button) return;
-
-                const currentState = keyboardLetterStates[letter];
-
-                // If current state is 'correct', do not downgrade
-                if (currentState === 'correct') {
-                    return;
-                }
-                // If current state is 'present' and new state is 'correct', upgrade
-                if (currentState === 'present' && newState === 'correct') {
-                    button.classList.remove('present', 'absent');
-                    button.classList.add('correct');
-                    keyboardLetterStates[letter] = 'correct';
-                    return;
-                }
-                // If current state is 'absent' and new state is 'present' or 'correct', upgrade
-                if (currentState === 'absent' && (newState === 'present' || newState === 'correct')) {
-                    button.classList.remove('absent');
-                    button.classList.add(newState);
-                    keyboardLetterStates[letter] = newState;
-                    return;
-                }
-                // If no state yet, or current state is worse than new state (e.g., no state -> absent)
-                if (!currentState) {
-                    button.classList.add(newState);
-                    keyboardLetterStates[letter] = newState;
-                    return;
-                }
-            }
-
-            /**
-             * Resets all keyboard button colors to their default state.
-             */
-            function resetKeyboardColors() {
-                const buttons = keyboardElement.querySelectorAll('.keyboard-button');
-                buttons.forEach(button => {
-                    button.classList.remove('correct', 'present', 'absent');
-                });
-            }
-
-
-            /**
-             * Ends the game, disabling input and showing the reset button.
-             * @param {boolean} won - True if the player won, false otherwise.
-             */
-            function endGame(won) {
-                gameEnded = true;
-                resetButton.classList.remove('hidden');
-            }
-
-            /**
-             * Shows the "How to Play" modal.
-             */
-            function showHowToPlayModal() {
-                howToPlayModal.classList.remove('hidden');
-                howToPlayModal.style.display = 'flex'; // Ensure it uses flex for centering
-            }
-
-            /**
-             * Hides the "How to Play" modal.
-             */
-            function hideHowToPlayModal() {
-                howToPlayModal.classList.add('hidden');
-                howToPlayModal.style.display = 'none'; // Revert to none for complete hiding
-            }
-
-            // --- Event Listeners ---
-
-            // Physical keyboard input
-            document.addEventListener('keydown', (event) => {
-                if (gameEnded) return;
-
-                const key = event.key.toUpperCase();
-
-                if (key.length === 1 && key >= 'A' && key <= 'Z' && currentInputLetters.length < WORD_LENGTH) {
-                    currentInputLetters.push(key);
-                    updateTile(currentAttempt, currentInputLetters.length - 1, key);
-                } else if (key === 'BACKSPACE') {
-                    if (currentInputLetters.length > 0) {
-                        const lastIndex = currentInputLetters.length - 1; // Get the index of the character to clear
-                        currentInputLetters.pop();
-                        updateTile(currentAttempt, lastIndex, ''); // Clear the tile at that index
-                    }
-                } else if (key === 'ENTER') {
-                    handleGuess();
-                }
-            });
-
-            // On-screen keyboard clicks
-            keyboardElement.addEventListener('click', (event) => {
-                if (gameEnded) return;
-
-                const target = event.target;
-                if (target.classList.contains('keyboard-button')) {
-                    const key = target.dataset.key;
-
-                    if (key === 'Backspace') {
-                        if (currentInputLetters.length > 0) {
-                            const lastIndex = currentInputLetters.length - 1; // Get the index of the character to clear
-                            currentInputLetters.pop();
-                            updateTile(currentAttempt, lastIndex, ''); // Clear the tile at that index
-                        }
-                    } else if (key === 'Enter') {
-                        handleGuess();
-                    } else if (key.length === 1 && key >= 'A' && key <= 'Z' && currentInputLetters.length < WORD_LENGTH) {
-                        currentInputLetters.push(key);
-                        updateTile(currentAttempt, currentInputLetters.length - 1, key); // Update current letter on board
-                    }
-                }
-            });
-
-            // Reset button click
-            resetButton.addEventListener('click', initializeGame);
-
-            // How to Play modal interactions
-            howToPlayButton.addEventListener('click', showHowToPlayModal);
-            modalCloseButton.addEventListener('click', hideHowToPlayModal);
-            window.addEventListener('click', (event) => {
-                if (event.target === howToPlayModal) {
-                    hideHowToPlayModal();
-                }
-            });
-
-            // Initial game setup when the page loads
-            initializeGame();
+          } else if (key === "ENTER") {
+            handleGuess();
+          }
         });
+
+        // On-screen keyboard clicks
+        keyboardElement.addEventListener("click", (event) => {
+          if (gameEnded) return;
+
+          const target = event.target;
+          if (target.classList.contains("keyboard-button")) {
+            const key = target.dataset.key;
+
+            if (key === "Backspace") {
+              if (currentInputLetters.length > 0) {
+                const lastIndex = currentInputLetters.length - 1; // Get the index of the character to clear
+                currentInputLetters.pop();
+                updateTile(currentAttempt, lastIndex, ""); // Clear the tile at that index
+              }
+            } else if (key === "Enter") {
+              handleGuess();
+            } else if (key.length === 1 && key >= "A" && key <= "Z" && currentInputLetters.length < WORD_LENGTH) {
+              currentInputLetters.push(key);
+              updateTile(currentAttempt, currentInputLetters.length - 1, key); // Update current letter on board
+            }
+          }
+        });
+
+        // Reset button click
+        resetButton.addEventListener("click", initializeGame);
+
+        // How to Play modal interactions
+        howToPlayButton.addEventListener("click", showHowToPlayModal);
+        modalCloseButton.addEventListener("click", hideHowToPlayModal);
+        window.addEventListener("click", (event) => {
+          if (event.target === howToPlayModal) {
+            hideHowToPlayModal();
+          }
+        });
+
+        // Initial game setup when the page loads
+        initializeGame();
+      });
     </script>
-</body>
+  </body>
 </html>
